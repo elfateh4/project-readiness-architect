@@ -1,6 +1,6 @@
 # project-readiness-architect
 
-[![skills.sh](https://skills.sh/b/elfateh4/project-readiness-architect)](https://skills.sh/elfateh4/project-readiness-architect)
+[Live on skills.sh](https://skills.sh/elfateh4/project-readiness-architect) · [GitHub](https://github.com/elfateh4/project-readiness-architect)
 
 > An agent skill that audits a repository against a production-readiness checklist and implements whatever's missing — git hygiene, CI/CD, testing, OpenAPI, repo files, branch protection.
 
