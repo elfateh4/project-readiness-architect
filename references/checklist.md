@@ -45,7 +45,7 @@ Every item below carries: **what "ready" means** and **how to detect it**. Verdi
 | pre-commit: lint + format | `.husky/pre-commit` runs lint-staged | `test -f .husky/pre-commit && grep lint-staged .husky/pre-commit; test -f .lintstagedrc.json` |
 | Secret scanning (gitleaks) | hook calls gitleaks OR gitleaks in CI | `grep gitleaks .husky/pre-commit .github/workflows/*.yml 2>/dev/null` |
 | Semantic versioning + changelog | `.releaserc.json` + `CHANGELOG.md` | `test -f .releaserc.json; test -f CHANGELOG.md` |
-| Husky internal dir gitignored | `.husky/_/` in `.gitignore` | `grep '.husky/_' .gitignore` |
+| Husky internal dir gitignored | `.husky/_/` in `.gitignore` | `test -f .gitignore && grep -q '.husky/_' .gitignore` — distinguish three states: no `.gitignore` at all (✗, blocks all other gitignore-dependent items), `.gitignore` exists but lacks the line (✗, fix is one append), or line present (✓) |
 
 ## 6. CI/CD
 
@@ -82,4 +82,10 @@ Every item below carries: **what "ready" means** and **how to detect it**. Verdi
 | `staging` protected | same | `gh api repos/:owner/:repo/branches/staging/protection` |
 | `main` protected | require PR + status checks + no force-push | `gh api repos/:owner/:repo/branches/main/protection` |
 
-If `gh api …/protection` returns 404, the branch is unprotected (✗). If the repo has no `gh` remote, fall back to `git branch -a` and a ⚠ (cannot verify remotely).
+Verdict rules for the `gh api .../protection` check:
+- HTTP 200 → ✓ protected.
+- HTTP 404 → ✗ unprotected (branch exists remotely, no protection rule).
+- "Could not resolve to a Repository" / no `origin` remote → ⚠ (cannot verify remotely; first run `git remote add origin <url>` and `git push -u origin dev staging main`, then re-audit).
+- Branch absent (`git branch -a | grep -q staging` returns 1) → ✗ (branch doesn't exist yet — branch protection can't apply; create it before fixing).
+
+Pre-flight for this section: `git remote -v` must show at least one `fetch` remote. If it doesn't, all three branch-protection items are ⚠ and the next step is wiring the remote, not setting protection.

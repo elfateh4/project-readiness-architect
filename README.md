@@ -36,6 +36,10 @@ Pre-flight  →  Audit  →  Report  →  STOP  →  Implement  →  Verify
 - **Implement** runs one domain at a time, idempotently — re-running on an already-ready repo is a no-op. Version pins resolve to current majors via the `context7` MCP before writing.
 - **Verify** demands evidence (exit-0 commands, actual `gh api` responses, a non-empty `docs/openapi.yaml`) before claiming done.
 
+## Scope
+
+This skill covers **dev-infra readiness** — the repo hygiene, CI/CD, testing, build, and release machinery an engineering team needs before shipping. It does **not** cover enterprise procurement / compliance readiness (SOC 2, GDPR, pen-test cadence, incident-response plans, DR, data-retention, accessibility VPATs, observability stack). Those are out of scope and should be layered on separately (e.g., via a compliance consultancy or a SOC 2 readiness tool). If your definition of "production-ready" includes those, run this skill first to get the engineering baseline, then layer the compliance work on top.
+
 ## Install
 
 ```bash

@@ -19,7 +19,7 @@ Before auditing, probe the layout so the globs in the reference files map to the
 - Record the globs the reference files use (e.g. `frontend/src/web/**/*.{js,jsx}`). If a dir is missing, substitute the detected equivalent before implementing — never implement a glob whose target doesn't exist.
 - If the root has no `package.json` at all, STOP and ask the user whether this is a JS project; if not, this skill does not apply.
 
-The detected layout stays in your working context for the rest of the run.
+The detected layout stays in your working context for the rest of the run. Also record: **does a git remote exist?** (`git remote -v` shows at least one fetch URL). If not, all branch-protection items (checklist §9) will be ⚠ regardless of local state — flag this to the user up-front so they know the remote must be wired before that domain can be implemented.
 
 ### 1. Audit
 
