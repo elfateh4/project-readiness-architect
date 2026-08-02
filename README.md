@@ -1,5 +1,7 @@
 # project-readiness-architect
 
+[![skills.sh](https://skills.sh/b/elfateh4/project-readiness-architect)](https://skills.sh/elfateh4/project-readiness-architect)
+
 > An agent skill that audits a repository against a production-readiness checklist and implements whatever's missing — git hygiene, CI/CD, testing, OpenAPI, repo files, branch protection.
 
 A single agent skill (`SKILL.md` + bundled references) that turns "is my repo ready for production?" into a deterministic workflow: **Audit → Report → STOP → Implement one domain → Verify**. Built for the open agent skills ecosystem and installable via the `skills` CLI.
