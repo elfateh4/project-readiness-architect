@@ -1,6 +1,6 @@
 # project-readiness-architect
 
-[Live on skills.sh](https://skills.sh/elfateh4/project-readiness-architect)
+[![skills.sh](https://skills.sh/b/elfateh4/project-readiness-architect)](https://skills.sh/elfateh4/project-readiness-architect)
 
 > An agent skill that audits a repository against a production-readiness checklist and implements whatever's missing — git hygiene, CI/CD, testing, OpenAPI, repo files, branch protection.
 
@@ -97,7 +97,7 @@ The skill does not install Node or `gh` itself; it verifies their presence in th
 
 ## Design notes
 
-- **Single source of truth** for the literal branch names (`dev`, `staging`, `main`) — owned by `references/repo-files.md` section 7; everything else references, never redefines.
+- **Single source of truth** for the literal branch names (`dev`, `staging`, `main`) — owned by `references/repo-files.md` §7; everything else references, never redefines.
 - **Idempotent by design** — every implementation file is diffed and merged if it already exists. A re-run on an already-ready repo is a no-op.
 - **Stack-aware** — the pre-flight step probes the monorepo shape and substitutes globs. The reference blueprints assume a canonical `frontend/` + `backend/` layout; if your layout is different, the skill adapts.
 - **ESM by default** — all reference code uses `import`/`export`. CJS fallbacks are noted inline for stacks that mandate it. The skill no longer ships configs that crash with `ERR_REQUIRE_ESM` on a modern `commitlint`/`pino`/`zod-to-openapi` install.
@@ -108,4 +108,4 @@ MIT. See [`LICENSE`](LICENSE).
 
 ## Contributing
 
-Issues and PRs welcome — file them on the Issues tab. The skill is most useful when its reference blueprints track current majors of husky, commitlint, semantic-release, pino, zod-to-openapi, trivy-action, and k6 — pin-drift is the main source of sediment, so any "bump pin to vX" PR is appreciated.
+Issues and PRs welcome at <https://github.com/elfateh4/project-readiness-architect>. The skill is most useful when its reference blueprints track current majors of husky, commitlint, semantic-release, pino, zod-to-openapi, trivy-action, and k6 — pin-drift is the main source of sediment, so any "bump pin to vX" PR is appreciated.

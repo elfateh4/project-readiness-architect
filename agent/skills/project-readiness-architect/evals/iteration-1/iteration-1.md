@@ -19,17 +19,17 @@ Both completed silently and the target repo was left unchanged — the with-skil
 
 - ✅ **Pre-flight step fired**: detected monorepo, workspaces, CJS, no `apps/`, no git remote. Recorded all four.
 - ✅ **Audit step fired in quick mode**: ran every detection command from `references/checklist.md` verbatim. All 35 items got a verdict + evidence.
-- ✅ **Report step fired**: returned the diffable Markdown table specified in `SKILL.md` section 2.
+- ✅ **Report step fired**: returned the diffable Markdown table specified in `SKILL.md` §2.
 - ✅ **STOP gate fired correctly**: presented priority list, asked "Which domain should I implement?", halted. Implement and Verify correctly did not fire.
 - ✅ **No skill contradictions encountered**: agent flagged minor under-specification, not contradictions.
 
 ## Skill defects found (fixed in this iteration)
 
-1. **`references/checklist.md` section 5 — `.husky/_/` gitignored.** Detection `grep '.husky/_' .gitignore` returned nonzero for two distinct root causes: no `.gitignore` at all, vs `.gitignore` exists but lacks the line. **Fix:** detection now distinguishes three explicit states (no `.gitignore` / missing line / present) and the item notes cross-dependency with the "Repo files" `.gitignore` concerns.
+1. **`references/checklist.md` §5 — `.husky/_/` gitignored.** Detection `grep '.husky/_' .gitignore` returned nonzero for two distinct root causes: no `.gitignore` at all, vs `.gitignore` exists but lacks the line. **Fix:** detection now distinguishes three explicit states (no `.gitignore` / missing line / present) and the item notes cross-dependency with the "Repo files" `.gitignore` concerns.
 
-2. **`references/checklist.md` section 9 — Branch protection fallback was prose-only, no shell command.** The with-skill agent had to read the prose paragraph and improvise. **Fix:** added explicit verdict rules for HTTP 200 / 404 / "no remote" / "branch absent" so the agent can decide from `gh api` exit output, not prose interpretation.
+2. **`references/checklist.md` §9 — Branch protection fallback was prose-only, no shell command.** The with-skill agent had to read the prose paragraph and improvise. **Fix:** added explicit verdict rules for HTTP 200 / 404 / "no remote" / "branch absent" so the agent can decide from `gh api` exit output, not prose interpretation.
 
-3. **`SKILL.md` section Pre-flight — didn't explicitly probe `git remote -v`.** Branch-protection items were marked ⚠ on a no-remote repo, but the user wasn't told up-front that they'd be ⚠ until the remote was wired. **Fix:** Pre-flight now records whether a remote exists and flags it to the user at audit time, not at implement time.
+3. **`SKILL.md` §Pre-flight — didn't explicitly probe `git remote -v`.** Branch-protection items were marked ⚠ on a no-remote repo, but the user wasn't told up-front that they'd be ⚠ until the remote was wired. **Fix:** Pre-flight now records whether a remote exists and flags it to the user at audit time, not at implement time.
 
 ## Observations not requiring fixes
 

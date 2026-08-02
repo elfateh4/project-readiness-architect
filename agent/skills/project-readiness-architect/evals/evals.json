@@ -1,0 +1,26 @@
+{
+  "skill_name": "project-readiness-architect",
+  "evals": [
+    {
+      "id": 1,
+      "name": "audit-missing-everything",
+      "prompt": "I just took over a Next.js + Express monorepo from a contractor who left. The repo has frontend/ and backend/ dirs, a single isolated index.js, no tests, no CI, no husky, no commitlint — commits are like 'stuff' and 'fixed it again'. I want to ship this to a paying enterprise customer next quarter and need to know everything that's missing before we're production-grade. Audit this repo against the Project Readiness Checklist and tell me what's there and what's not.",
+      "expected_output": "A Markdown table covering all 9 readiness domains with verdicts (✓/✗/⚠) and one line of evidence per item. Domains 3-9 should show mostly ✗. Should STOP at the end and ask which domain to implement first — should NOT silently start implementing.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "implement-git-hygiene-on-monorepo",
+      "prompt": "We have a clean monorepo (root package.json with workspaces, frontend/ uses Vite, backend/ is Express). Right now commits are a free-for-all. Can you set up conventional commits enforced via husky + commitlint, lint-staged running eslint on the backend and biome on the frontend packages/ui dir, and semantic-release configured so dev/staging/main branches produce alpha/rc/release versions? The repo already has a 4-month git history on main so don't blow away CHANGELOG entries if they exist.",
+      "expected_output": "Creates commitlint.config.mjs (ESM), .husky/commit-msg, .husky/pre-commit, .lintstagedrc.json with the specified globs, .releaserc.json with the 3-branch prerelease config, seeds CHANGELOG.md header if missing or preserves existing content. Adds \"type\": \"module\" to root package.json (or flags if CJS is intentional). Appends .husky/_/ to .gitignore idempotently. Runs `npx husky install`, `echo 'feat: x' | npx commitlint`, `npx semantic-release --dry-run --no-ci`, `npx lint-staged --debug` and shows the exit codes before claiming done.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "branch-protection-and-gh-status-checks",
+      "prompt": "Our team's CI workflow at .github/workflows/ci.yml is already passing — three jobs named 'ci/backend', 'ci/ui', and 'commitlint'. I want to lock down branch protection on dev, staging, and main so nobody can push directly, force-push, or delete the branch. Require one approval on dev/staging and two on main with linear history. CODEOWNERS should require the platform team on .github/.husky/. Use gh to actually set this up against our remote — don't just write the config somewhere.",
+      "expected_output": "Creates .github/CODEOWNERS with the platform team as default and on the tooling paths. Runs `gh api .../branches/dev/protection`, `.../staging/protection`, `.../main/protection` with required_status_checks[contexts] matching exactly ['ci/backend','ci/ui','commitlint'] (NOT the deprecated 'ci' name — they match the actual job `name:` fields). main gets required_approving_review_count=2 and required_linear_history=true. After each PUT, runs gh api GET to verify the 200 response and pastes the protection summary into the report. Doesn't attempt raw API token manipulation — uses gh auth.",
+      "files": []
+    }
+  ]
+}

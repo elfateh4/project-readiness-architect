@@ -1,10 +1,10 @@
 # Testing & CI/CD Implementation Reference
 
-When asked to implement CI/CD or Testing infrastructure, use the blueprints below. Substitute the job `name:` fields to match the repo — `branches:` and `contexts:` arrays reference the same literal branch names owned by `references/repo-files.md` section 7; do not redefine the branch set here.
+When asked to implement CI/CD or Testing infrastructure, use the blueprints below. Substitute the job `name:` fields to match the repo — `branches:` and `contexts:` arrays reference the same literal branch names owned by `references/repo-files.md` §7; do not redefine the branch set here.
 
 ## 1. CI Quality Gate (GitHub Actions)
 
-Create `.github/workflows/ci.yml`. Matrix covers Backend CI, UI CI, and Commitlint jobs running in parallel; status checks named `ci/backend`, `ci/ui`, and `commitlint` so `repo-files.md` section 7 can reference them in `required_status_checks[contexts]`.
+Create `.github/workflows/ci.yml`. Matrix covers Backend CI, UI CI, and Commitlint jobs running in parallel; status checks named `ci/backend`, `ci/ui`, and `commitlint` so `repo-files.md` §7 can reference them in `required_status_checks[contexts]`.
 
 ```yaml
 name: ci
@@ -99,7 +99,7 @@ If the repo is single-app (no `backend/` or `frontend/src/web/`), collapse the r
 
 ## 2. Security Scanning (Trivy)
 
-Literal branch names owned by `references/repo-files.md` section 7.
+Literal branch names owned by `references/repo-files.md` §7.
 
 Create `.github/workflows/security.yml`:
 
@@ -160,7 +160,7 @@ Before pinning, resolve the current trivy-action major via `context7_resolve-lib
 
 ## 3. Renovate for Dependencies
 
-Create `renovate.json` at the root (or `.github/dependabot.yml` instead — see `references/repo-files.md` section 8; ship exactly one).
+Create `renovate.json` at the root (or `.github/dependabot.yml` instead — see `references/repo-files.md` §8; ship exactly one).
 
 ```json
 {
@@ -265,4 +265,4 @@ Add a CI job to `.github/workflows/ci.yml` (only on PRs touching `frontend/`):
       - run: npx @lhci/cli autorun
 ```
 
-Lighthouse becomes a required context in `repo-files.md` section 7 only after the CI workflow has run at least once and published the check name `ci/lighthouse` to GitHub — add it to `required_status_checks[contexts]` then.
+Lighthouse becomes a required context in `repo-files.md` §7 only after the CI workflow has run at least once and published the check name `ci/lighthouse` to GitHub — add it to `required_status_checks[contexts]` then.

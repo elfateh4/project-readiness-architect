@@ -75,7 +75,7 @@ chmod +x .husky/commit-msg .husky/pre-commit
 
 ## 4. Lint-staged Config
 
-Create `.lintstagedrc.json` at the root. **Substitute the globs to match the detected layout** from the pre-flight step (`SKILL.md` section Pre-flight). The globs below assume the canonical monorepo (`frontend/src/web`, `frontend/src/admin`, `frontend/packages/ui`, `backend/`).
+Create `.lintstagedrc.json` at the root. **Substitute the globs to match the detected layout** from the pre-flight step (`SKILL.md` §Pre-flight). The globs below assume the canonical monorepo (`frontend/src/web`, `frontend/src/admin`, `frontend/packages/ui`, `backend/`).
 
 ```json
 {
@@ -97,7 +97,7 @@ Append to `.gitignore` (idempotent — only append lines not already present):
 
 ## 5. Semantic Release
 
-Create `.releaserc.json` at the root. The literal branch names (`main`, `staging`, `dev`) are the single source of truth — `references/repo-files.md` section 7 and `references/ci-testing.md` section 2 reference the same names, don't redefine them here.
+Create `.releaserc.json` at the root. The literal branch names (`main`, `staging`, `dev`) are the single source of truth — `references/repo-files.md` §7 and `references/ci-testing.md` §2 reference the same names, don't redefine them here.
 
 ```json
 {

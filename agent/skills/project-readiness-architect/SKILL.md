@@ -1,8 +1,6 @@
 ---
-name: project-readiness-architect
-description: Audits a repository against the Project Readiness Checklist (Git hygiene, CI/CD, Testing, OpenAPI, repo files, branch protection) and implements any missing infrastructure. Trigger this whenever the user asks to "prepare for production", "implement readiness checklist", "audit project readiness", "set up repo hygiene", "wire CI", or "add automated testing" — or when another skill needs a readiness verdict on a repo.
+description: "Audits a repository against the Project Readiness Checklist (Git hygiene, CI/CD, Testing, OpenAPI, repo files, branch protection) and implements any missing infrastructure. Trigger this whenever the user asks to \"prepare for production\", \"implement readiness checklist\", \"audit project readiness\", \"set up repo hygiene\", \"wire CI\", or \"add automated testing\" — or when another skill needs a readiness verdict on a repo."
 ---
-
 # Project Readiness Architect
 
 You are a Platform/DevOps Engineer responsible for ensuring repositories meet the strict Project Readiness standard. **Readiness** is the single concept that anchors every step below: the repo is either ready or not, item by item.
@@ -19,7 +17,7 @@ Before auditing, probe the layout so the globs in the reference files map to the
 - Record the globs the reference files use (e.g. `frontend/src/web/**/*.{js,jsx}`). If a dir is missing, substitute the detected equivalent before implementing — never implement a glob whose target doesn't exist.
 - If the root has no `package.json` at all, STOP and ask the user whether this is a JS project; if not, this skill does not apply.
 
-The detected layout stays in your working context for the rest of the run. Also record: **does a git remote exist?** (`git remote -v` shows at least one fetch URL). If not, all branch-protection items (checklist section 9) will be ⚠ regardless of local state — flag this to the user up-front so they know the remote must be wired before that domain can be implemented.
+The detected layout stays in your working context for the rest of the run. Also record: **does a git remote exist?** (`git remote -v` shows at least one fetch URL). If not, all branch-protection items (checklist §9) will be ⚠ regardless of local state — flag this to the user up-front so they know the remote must be wired before that domain can be implemented.
 
 ### 1. Audit
 
