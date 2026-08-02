@@ -17,3 +17,10 @@ node_modules/
 # Build
 dist/
 build/
+
+# Local skill install artifacts (do NOT commit these — they come from `npx skills add` against this same repo)
+/.agents/
+/agent/
+/.claude/
+skills-lock.json
+*.pid
