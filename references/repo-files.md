@@ -152,7 +152,150 @@ If the user uses a different runtime manager (`.tool-versions` for asdf/volta), 
 nodejs 20.18.0
 ```
 
-## 7. Branch Protection via `gh`
+## 7. Makefile
+
+A single `Makefile` at the repo root that wraps the full development workflow. Use the **dispatch pattern** below — top-level targets for common commands, then subcommand dispatchers (`make backend <cmd>`, `make frontend <cmd>`, `make db <cmd>`) that route to the underlying tool.
+
+The agent picks the **backend variant** based on the detected stack from pre-flight (Python/uv → Python variant; Node → Node variant; Go → Go variant; Rust → Rust variant). The frontend and db dispatchers are stack-agnostic.
+
+```makefile
+SHELL := /bin/bash
+RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+$(foreach a,$(RUN_ARGS),$(if $(filter $(a),install check clean help backend frontend db),,$(eval $(a):;@:)))
+
+.PHONY: install check clean help backend frontend db
+
+help:
+	@echo "make install        install all deps"
+	@echo "make check          full gate: backend + frontend + lint + test"
+	@echo "make clean          remove build artifacts"
+	@echo "make backend <cmd>  deps|dev|build|test|lint|format|verify|openapi|migrate|audit"
+	@echo "make frontend <cmd> deps|dev|build|preview|lint|typecheck|test"
+	@echo "make db <cmd>       run|stop|clear"
+
+install:
+	@cd backend && $(BACKEND_INSTALL)
+	@npm --prefix frontend install
+
+check:
+	@cd backend && $(BACKEND_CHECK)
+	@npm --prefix frontend run lint
+	@npm --prefix frontend run typecheck
+	@npm --prefix frontend run test --if-present
+
+clean:
+	@rm -rf frontend/dist frontend/node_modules backend/.venv
+
+# ── Backend dispatcher ─────────────────────────────────────────
+backend:
+	@cd backend && case "$(word 1,$(RUN_ARGS))" in \
+		deps)    $(BACKEND_INSTALL) ;; \
+		dev)     $(BACKEND_DEV) ;; \
+		build)   $(BACKEND_BUILD) ;; \
+		test)    $(BACKEND_TEST) ;; \
+		lint)    $(BACKEND_LINT) ;; \
+		format)  $(BACKEND_FORMAT) ;; \
+		verify)  $(BACKEND_VERIFY) ;; \
+		openapi) $(BACKEND_OPENAPI) ;; \
+		migrate) $(BACKEND_MIGRATE) ;; \
+		audit)   $(BACKEND_AUDIT) ;; \
+		*)       echo "unknown backend command: '$(word 1,$(RUN_ARGS))' (see 'make help')"; exit 1 ;; \
+	esac
+
+# ── Frontend dispatcher ────────────────────────────────────────
+frontend:
+	@case "$(word 1,$(RUN_ARGS))" in \
+		deps)       npm --prefix frontend install ;; \
+		dev)        npm --prefix frontend run dev ;; \
+		build)      npm --prefix frontend run build ;; \
+		preview)    npm --prefix frontend run preview ;; \
+		lint)       npm --prefix frontend run lint ;; \
+		typecheck)  npm --prefix frontend run typecheck ;; \
+		test)       npm --prefix frontend run test ;; \
+		*)          echo "unknown frontend command: '$(word 1,$(RUN_ARGS))' (see 'make help')"; exit 1 ;; \
+	esac
+
+# ── Backing services ───────────────────────────────────────────
+db:
+	@case "$(word 1,$(RUN_ARGS))" in \
+		run)   docker compose up -d ;; \
+		stop)  docker compose stop ;; \
+		clear) docker compose down -v --remove-orphans ;; \
+		*)     echo "unknown db command: '$(word 1,$(RUN_ARGS))' (see 'make help')"; exit 1 ;; \
+	esac
+```
+
+### Backend variants (pick one based on pre-flight stack detection)
+
+Set `BACKEND_INSTALL`, `BACKEND_CHECK`, `BACKEND_DEV`, `BACKEND_BUILD`, `BACKEND_TEST`, `BACKEND_LINT`, `BACKEND_FORMAT`, `BACKEND_VERIFY`, `BACKEND_OPENAPI`, `BACKEND_MIGRATE`, `BACKEND_AUDIT` via a top-level `ifeq` block in the Makefile, OR just inline the commands in the dispatcher directly (simpler, recommended for single-stack repos).
+
+**Python / uv** (leadflow pattern):
+
+```makefile
+BACKEND_INSTALL = uv sync --extra dev
+BACKEND_CHECK   = uv run ruff check . && uv run ruff format --check . && uv run pytest -q
+BACKEND_DEV     = uv run uvicorn app.main:app --reload
+BACKEND_BUILD   = uv build
+BACKEND_TEST    = uv run pytest -q
+BACKEND_LINT    = uv run ruff check .
+BACKEND_FORMAT  = uv run ruff format .
+BACKEND_VERIFY  = uv run ruff check . && uv run ruff format --check . && uv run pytest -q
+BACKEND_OPENAPI = uv run python scripts/gen_openapi.py
+BACKEND_MIGRATE = uv run alembic upgrade head
+BACKEND_AUDIT   = uv audit
+```
+
+**Node / npm**:
+
+```makefile
+BACKEND_INSTALL = npm ci
+BACKEND_CHECK   = npm run lint && npm run typecheck && npm test
+BACKEND_DEV     = npm run dev
+BACKEND_BUILD   = npm run build
+BACKEND_TEST    = npm test
+BACKEND_LINT    = npm run lint
+BACKEND_FORMAT  = npm run format
+BACKEND_VERIFY  = npm run lint && npm run typecheck && npm test
+BACKEND_OPENAPI = npm run openapi
+BACKEND_MIGRATE = npm run migrate
+BACKEND_AUDIT   = npm audit
+```
+
+**Go**:
+
+```makefile
+BACKEND_INSTALL = go mod tidy
+BACKEND_CHECK   = go build ./... && go test ./... && golangci-lint run ./...
+BACKEND_DEV     = go run ./cmd/server
+BACKEND_BUILD   = go build -o bin/server ./cmd/server
+BACKEND_TEST    = go test ./...
+BACKEND_LINT    = golangci-lint run ./...
+BACKEND_FORMAT  = gofmt -w .
+BACKEND_VERIFY  = go build ./... && go test ./... && golangci-lint run ./...
+BACKEND_OPENAPI = go run ./scripts/gen_openapi
+BACKEND_MIGRATE = go run ./scripts/migrate
+BACKEND_AUDIT   = govulncheck ./...
+```
+
+**Rust / cargo**:
+
+```makefile
+BACKEND_INSTALL = cargo fetch
+BACKEND_CHECK   = cargo clippy -- -D warnings && cargo test
+BACKEND_DEV     = cargo run
+BACKEND_BUILD   = cargo build --release
+BACKEND_TEST    = cargo test
+BACKEND_LINT    = cargo clippy -- -D warnings
+BACKEND_FORMAT  = cargo fmt
+BACKEND_VERIFY  = cargo clippy -- -D warnings && cargo test && cargo fmt --check
+BACKEND_OPENAPI = cargo run --bin gen-openapi
+BACKEND_MIGRATE = cargo run --bin migrate
+BACKEND_AUDIT   = cargo audit
+```
+
+**Completion criterion for Makefile:** `make help` lists all targets, `make install` installs both backend and frontend deps, and `make check` runs the full gate without error. All versioned tools (golangci-lint, cargo-clippy, ruff, uv, etc.) MUST be pinned to their current major — verify via `context7` MCP before writing.
+
+## 8. Branch Protection via `gh`
 
 Requires `gh` authenticated against the repo remote. If `gh auth status` fails, STOP and tell the user to run `gh auth login` — do not attempt to set protection via raw API tokens manipulated by the agent.
 
@@ -189,7 +332,7 @@ gh api repos/:owner/:repo/branches/<branch>/protection | head -5
 
 A 200 response means protected; a 404 means unprotected. Paste each branch's status into the report.
 
-## 8. Renovate alternative (optional)
+## 9. Renovate alternative (optional)
 
 If the user prefers Dependabot over Renovate (or Renovate is disabled at the org level), create `.github/dependabot.yml` instead of `renovate.json`:
 

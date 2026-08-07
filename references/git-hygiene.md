@@ -17,17 +17,17 @@ Add the necessary dependencies and scripts:
     "prepare": "husky"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.8.1",
-    "@commitlint/config-conventional": "^19.8.1",
+    "@commitlint/cli": "^21.2.1",
+    "@commitlint/config-conventional": "^21.2.0",
     "husky": "^9.1.7",
-    "lint-staged": "^15.5.2",
-    "semantic-release": "^25.0.8",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/exec": "^6.0.3",
-    "@semantic-release/git": "^10.0.1",
-    "@semantic-release/github": "^10.3.5",
+    "lint-staged": "^17.3.0",
+    "semantic-release": "^25.0.9",
+    "@semantic-release/changelog": "^7.0.0",
+    "@semantic-release/exec": "^7.1.0",
+    "@semantic-release/git": "^11.0.1",
+    "@semantic-release/github": "^12.0.9",
     "@semantic-release/commit-analyzer": "^13.0.1",
-    "@semantic-release/release-notes-generator": "^14.0.3"
+    "@semantic-release/release-notes-generator": "^14.1.1"
   }
 }
 ```
@@ -97,7 +97,7 @@ Append to `.gitignore` (idempotent — only append lines not already present):
 
 ## 5. Semantic Release
 
-Create `.releaserc.json` at the root. The literal branch names (`main`, `staging`, `dev`) are the single source of truth — `references/repo-files.md` section 7 and `references/ci-testing.md` section 2 reference the same names, don't redefine them here.
+Create `.releaserc.json` at the root. The literal branch names (`main`, `staging`, `dev`) are the single source of truth — `references/repo-files.md` section 8 and `references/ci-testing.md` section 2 reference the same names, don't redefine them here. This config is consumed by `.github/workflows/release.yml` (see `references/ci-testing.md` section 6).
 
 ```json
 {

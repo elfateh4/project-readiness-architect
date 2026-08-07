@@ -60,7 +60,7 @@ Every item below carries: **what "ready" means** and **how to detect it**. Verdi
 
 | Item | Ready means | Detection |
 |------|-------------|-----------|
-| Makefile for common commands | `Makefile` with `dev`, `test`, `lint`, `build` targets | `test -f Makefile; grep -E '^dev:|^test:|^build:' Makefile` |
+| Makefile for common commands | `Makefile` with dispatch pattern (`install`, `check`, `clean`, `help`, `backend`, `frontend`, `db`) | `test -f Makefile && grep -qE '^(install|check|clean|help|backend|frontend|db):' Makefile` |
 | docker-compose full local stack | `docker-compose.yml` with app + deps | `test -f docker-compose.yml \|\| test -f compose.yaml` |
 
 ## 8. Repo Files

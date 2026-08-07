@@ -57,7 +57,7 @@ Before mutating anything:
 - **Isolation:** recommend creating a `chore/readiness-<domain>` branch. Warn the user that semantic-release's first run on `main` will create a real release if `main` already has commits — so semantic-release should be wired last and only after the user confirms.
 - **Idempotency:** if a target file already exists, diff and merge; do not overwrite. A second run on an already-ready repo must be a no-op.
 
-Before pinning any dependency version in a reference file, resolve the current major via the `context7` MCP (`context7_resolve-library-id` then `context7_query-docs`); if the pinned major in the reference has fallen behind, note it to the user and update the pin in that run.
+**MUST use latest version.** Before pinning any dependency or tool version in a reference file, resolve the current major via the `context7` MCP (`context7_resolve-library-id` then `context7_query-docs`). If the pinned major in the reference has fallen behind, update the pin to the latest major **before** writing it into the user's repo and note the bump to the user. Never ship a stale pin — an outdated version can break silently (e.g., `ERR_REQUIRE_ESM`, deprecated APIs, missing security patches). This applies to every `npm` package, GitHub Action, Python package, Go module, and Rust crate referenced in any blueprint below.
 
 For exact configurations, read the relevant reference file **before** implementing:
 
